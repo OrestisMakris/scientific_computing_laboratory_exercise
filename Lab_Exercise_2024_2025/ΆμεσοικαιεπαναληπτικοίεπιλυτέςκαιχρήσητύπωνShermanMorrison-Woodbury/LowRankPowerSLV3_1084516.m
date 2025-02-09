@@ -5,7 +5,7 @@ function x = LowRankPowerSLV3_1084516(A, u, v, k, b)
 %   2) Τον τύπο Sherman–Morrison–Woodbury για το A^k + U*V'.
 %
 % Για την επίλυση με το A^k χρησιμοποιούμε την ιδέα ότι:
-%   A^{-k}b = (A^{-1})^k b,
+%   A^{-k}b = (A^{-1})^k ,
 % δηλαδή λύνοντας επανειλημμένα k συστήματα με το A.
 
 [U, V] = LowRankPower_1084516(A, u, v, k);
