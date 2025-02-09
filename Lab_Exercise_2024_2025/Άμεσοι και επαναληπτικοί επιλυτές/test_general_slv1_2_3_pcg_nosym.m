@@ -32,6 +32,7 @@ for idx = 1:length(ns)
     u = randn(n,1);
     v = randn(n,1);
     x_true = ones(n,1);
+
     
     % Κατασκευή του δεξιού μέλους b:
     % b = (A + u*v')^k * x_true, χωρίς σχηματισμό του (A+u*v') ρητά.
@@ -47,6 +48,7 @@ for idx = 1:length(ns)
     fprintf('Condition number of A+u*v'': %e\n', matCond);
     fprintf('Theoretical error bound (κ*eps): %e\n', theoreticalError);
     
+
     %% Μέθοδος 1: LowRankPowerSLV1_id
     tic;
     x1 = LowRankPowerSLV1_1084516(A, u, v, ks, b);
@@ -59,17 +61,20 @@ for idx = 1:length(ns)
     times(idx,2) = toc;
     errors(idx,2) = norm(x2 - x_true, inf);
     
+
     %% Μέθοδος 3: LowRankPowerSLV3_id
     tic;
     x3 = LowRankPowerSLV3_1084516(A, u, v, ks, b);
     times(idx,3) = toc;
     errors(idx,3) = norm(x3 - x_true, inf);
     
-    %% Μέθοδος 4: LowRankPowerSLVpcg_id (με χρήση pcg)
+
+    %% Μέθοδος 4: LowRankPowerSLVpcg_id (με χρήση pcg) 
     tic;
     x4 = LowRankPowerSLVpcg_1084516(A, u, v, ks, b);
-    times(idx,4) = toc;
-    errors(idx,4) = norm(x4 - x_true, inf);
+    times(idx,4) = toc;  
+
+    errors(idx,4) = norm(x4 - x_true, inf); 
     
     %% Μέθοδος 5: LowRankPowerSLVnonsym_id (με GMRES)
     tic;
@@ -77,14 +82,19 @@ for idx = 1:length(ns)
     times(idx,5) = toc;
     errors(idx,5) = norm(x5 - x_true, inf);
     
-    % Εμφάνιση αποτελεσμάτων για το τρέχον n:
+
+    % Εμφάνιση αποτελεσμάτων για το τρέχον n: 
     fprintf('Σφάλματα:\n');
     for m = 1:length(methodNames)
-        fprintf('  %s: %e\n', methodNames{m}, errors(idx, m));
-    end
+        fprintf('  %s:  %e\n', methodNames{m},  errors(idx, m));
+    end 
+
     fprintf('Χρόνοι (sec):\n');
+
     for m = 1:length(methodNames)
         fprintf('  %s: %f\n', methodNames{m}, times(idx, m));
     end
-    fprintf('-------------------------------\n\n');
+
+    fprintf('---------------------------- ----\n\n');
+    
 end
