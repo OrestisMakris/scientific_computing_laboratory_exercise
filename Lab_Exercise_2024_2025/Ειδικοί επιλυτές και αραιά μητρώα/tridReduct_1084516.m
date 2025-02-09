@@ -17,12 +17,12 @@ function x = tridReduct_1084516(A, B)
 
     % Έλεγχος για τις διαστάσεις του A
     if nRows ~= 3
-        error('Το μητρώο A πρέπει να έχει ακριβώς 3 γραμμές.');
+        error('Το μητρώο A πρέπει να έχει ακριβώς  3 γραμμές.');
     end
 
     % Προαιρετικός έλεγχος για το αν το n είναι δύναμη του 2
     if (mod(log2(n), 1) ~= 0)
-        warning('Το n δεν είναι δύναμη του 2. Η απόδοση μπορεί να διαφέρει.');
+        warning('Το n  δεν είναι δύναμη του 2. Η απόδοση μπορεί  να διαφέρει.');
     end
 
     % Εξαγωγή διαγωνίων (στήλες ως: [υπερδιαγώνιος; κύρια διαγώνιος; υποδιαγώνιος])
@@ -48,7 +48,8 @@ function x = tridReduct_1084516(A, B)
     % ****************************
     % ΠΡΟΣΩΡΙΝΗ ΟΜΟΓΕΝΟΠΟΙΗΣΗ (FORWARD REDUCTION)
     % ****************************
-    % Σε κάθε βήμα μειώνεται το μέγεθος του συστήματος κατά 2,
+
+    %  βήμα μειώνεται το μέγεθος του συστήματος κατά 2,
     % χρησιμοποιώντας vectorized ενημερώσεις τύπων:
     %
     %   b_even_new = b_even - a_even .* ( c_left ./ b_left ) - c_even .* ( a_right ./ b_right )
@@ -61,18 +62,22 @@ function x = tridReduct_1084516(A, B)
     %   - ο δεξιός γείτονας: index i+1 (αν υπάρχει)
     %
     % Οι ενημερώσεις γίνονται με element–wise (Hadamard) πράξεις.
+
+
     for lev = 1:levels
         a_prev = A_cell{lev};
         b_prev = B_cell{lev};
         c_prev = C_cell{lev};
-        d_prev = D_cell{lev};
-        N = length(b_prev);
+        d_prev = D_cell{ lev};
+        N = length( b_prev);
 
         % Επιλέγουμε τους "even" δείκτες στο τρέχον σύστημα
-        even = (2:2:N).';
-        newN = length(even);
+
+        even = (2: 2:N).';
+        newN =   length(even);
 
         % Προετοιμασία νέων διανυσμάτων (για τους even δείκτες)
+
         a_new = zeros(newN,1);
         b_new = zeros(newN,1);
         c_new = zeros(newN,1);
@@ -90,7 +95,7 @@ function x = tridReduct_1084516(A, B)
         b_new(:) = b_prev(even);
         if any(hasLeft)
             b_new(hasLeft) = b_new(hasLeft) - ...
-                a_prev(even(hasLeft)) .* ( c_prev(idx_left(hasLeft)) ./ b_prev(idx_left(hasLeft)) );
+                a_prev(even(hasLeft)) .* ( c_prev(idx_left( hasLeft)) ./ b_prev(idx_left( hasLeft )) );
         end
         if any(hasRight)
             b_new(hasRight) = b_new(hasRight) - ...
@@ -110,12 +115,15 @@ function x = tridReduct_1084516(A, B)
         end
         if any(hasRight)
             d_new(hasRight,:) = d_new(hasRight,:) - ...
-                c_prev(even(hasRight)) .* ( d_prev(idx_right(hasRight),:) ./ b_prev(idx_right(hasRight)) );
+                c_prev(even(hasRight)) .* (  d_prev(idx_right(hasRight),:) ./ b_prev(idx_right(hasRight)) );
         end
 
+
         % Αποθήκευση του νέου (μειωμένου) συστήματος στο επόμενο επίπεδο
+
         A_cell{lev+1} = a_new;
         B_cell{lev+1} = b_new;
+
         C_cell{lev+1} = c_new;
         D_cell{lev+1} = d_new;
     end
@@ -132,10 +140,12 @@ function x = tridReduct_1084516(A, B)
     %   x(i) = ( d(i) - a(i)*x(i-1) - c(i)*x(i+1) ) ./ b(i)
     %
     % οι ενημερώσεις γίνονται με element–wise πράξεις.
-    x_level = x_reduced;
+
+  
+    x_level  = x_reduced;
     for lev = levels:-1:1
         a_prev = A_cell{lev};
-        b_prev = B_cell{lev};
+        b_prev =  B_cell{ lev};
         c_prev = C_cell{lev};
         d_prev = D_cell{lev};
         N = length(b_prev);
@@ -149,23 +159,23 @@ function x = tridReduct_1084516(A, B)
 
         % Υπολογισμός για τους odd δείκτες
         odd = (1:2:N).';
-        idx_left = odd - 1;
+        idx_left =  odd - 1;
         idx_right = odd + 1;
 
         % Αρχικοποιούμε την προσωρινή λύση ως d_prev(odd)
         x_temp = d_prev(odd,:);
-        maskL = odd > 1;
+        maskL = odd  > 1;
         if any(maskL)
             % Σημείωση: (odd(maskL)-1)/2 αντιστοιχεί στο index back–mapping στο προηγούμενο επίπεδο
-            x_temp(maskL,:) = x_temp(maskL,:) - a_prev(odd(maskL)) .* x_level((odd(maskL)-1)/2, :);
+            x_temp(maskL,:) = x_temp(maskL,:) - a_prev(odd(maskL))  .* x_level((odd(maskL)-1)/2, :);
         end
-        maskR = odd < N;
+        maskR = odd  < N;
         if any(maskR)
-            x_temp(maskR,:) = x_temp(maskR,:) - c_prev(odd(maskR)) .* x_level((odd(maskR)+1)/2, :);
+            x_temp(maskR,:) =  x_temp(maskR,:) - c_prev(odd(maskR)) .* x_level((odd(maskR)+1)/2, :);
         end
-        x_curr(odd,:) = x_temp ./ b_prev(odd);
+        x_curr(odd,:) = x_temp ./  b_prev(odd);
 
         x_level = x_curr;
     end
-    x = x_level;
+    x = x_level ;
 end
