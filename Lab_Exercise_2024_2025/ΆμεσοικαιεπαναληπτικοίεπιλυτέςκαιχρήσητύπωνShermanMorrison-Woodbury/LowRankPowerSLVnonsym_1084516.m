@@ -1,21 +1,41 @@
+% Function using BiCGSTAB for the matrix-free Krylov method
 function x = LowRankPowerSLVnonsym_1084516(A, u, v, k, b)
-% LowRankPowerSLVnonsym_id
-% Επιλύει το σύστημα G x = b, όπου G = (A+u*v')^k, χρησιμοποιώντας
-% επαναληπτική μέθοδο τύπου Krylov (GMRES) σε matrix–free τρόπο.
-tol = 1e-6;
-maxit = 100;
-% Ορίζουμε τη συνάρτηση για τον πολλαπλασιασμό: 
-Ghandle = @(x) power_mult(x, A, u, v, k);
-[x, flag, relres] = gmres(Ghandle, b, [], tol, maxit);
-if flag ~= 0
-    warning('Η GMRES δεν συγκλίνει: flag = %d, relres = %e', flag, relres);
-end
+% LowRankPowerSLVnonsym_bicgstab_id
+% Solves the system G*x = b, where G = (A+u*v')^k, using a matrix-free
+% implementation of the BiCGSTAB method.
+%
+% This function avoids forming G explicitly by computing its action on vectors
+% through repeated multiplication using power_mult.
+%
+% Inputs:
+%   A  : n×n sparse matrix
+%   u,v: n×1 vectors
+%   k  : positive integer indicating the power
+%   b  : right-hand side vector
+%
+% Output:
+%   x  : approximate solution of (A+u*v')^k x = b
+%
+% The method uses a stopping tolerance with relative residual norm below 10^-6.
+
+    tol = 1e-6;
+    maxit =1000;  % maximum iterations (can be adjusted)
+    
+    % Define the matrix-free operator as a function handle.
+    Ghandle = @(x) power_mult(x, A, u, v, k);
+    
+    % Use BiCGSTAB to solve G*x = b.
+    [x, flag, relres] = bicgstab(Ghandle, b, tol, maxit);
+    if flag ~= 0
+        warning('BiCGSTAB did not converge: flag = %d, relres = %e', flag, relres);
+    end
 end
 
+%% Helper function for matrix-free multiplication with G = (A+u*v')^k.
 function y = power_mult(x, A, u, v, k)
-% Υπολογίζει y = (A+u*v')^k * x χωρίς να σχηματίζεται ρητά ο G.
-y = x;
-for i = 1:k
-    y = A * y + u * (v' * y);
-end
+    % Computes y = (A+u*v')^k * x without explicitly forming the matrix (A+u*v')^k.
+    y = x;
+    for i = 1:k
+        y = A * y + u * (v' * y);
+    end
 end
